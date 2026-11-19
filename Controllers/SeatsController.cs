@@ -1,4 +1,4 @@
-﻿namespace Library_Book_Lending.Controllers
+﻿namespace Library_Book_Lending.Controllers;
 using global::Library_Book_Lending.DTOs;
 using Library_Book_Lending.Data;
 using Library_Book_Lending.DTOs;
@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Library_Book_Lending.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
