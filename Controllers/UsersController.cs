@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace LibraryReservationPractice.Controllers;
+namespace Library_Book_Lending.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

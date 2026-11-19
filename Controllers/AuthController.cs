@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-namespace LibraryReservationPractice.Controllers;
+namespace Library_Book_Lending.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
