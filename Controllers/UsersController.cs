@@ -1,7 +1,6 @@
 ﻿using System.Security.Claims;
 using Library_Book_Lending.Data;
 using Library_Book_Lending.DTOs;
-using Library_Book_Lending.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -54,19 +53,10 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "Admin,Librarian")]
+    [Authorize(Roles = "Librarian")]
     public async Task<IActionResult> GetAllUsers()
     {
-        var query = _context.Users.AsQueryable();
-
-        if (User.IsInRole("Librarian"))
-        {
-            query = query.Where(u =>
-                u.Role == UserRole.Member &&
-                u.IsActive);
-        }
-
-        var users = await query
+        var users = await _context.Users
             .OrderBy(u => u.FullName)
             .Select(u => new UserResponse
             {
@@ -85,12 +75,12 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("staff")]
-    [Authorize(Roles = "Admin,Librarian")]
+    [Authorize(Roles = "Librarian")]
     public IActionResult StaffAccess()
     {
         return Ok(new
         {
-            message = "Staff access granted.",
+            message = "Librarian access granted.",
             role = User.FindFirstValue(ClaimTypes.Role)
         });
     }
@@ -106,15 +96,14 @@ public class UsersController : ControllerBase
         });
     }
 
-    [HttpGet("admin")]
-    [Authorize(Roles = "Admin")]
-    public IActionResult AdminAccess()
+    [HttpGet("librarian")]
+    [Authorize(Roles = "Librarian")]
+    public IActionResult LibrarianAccess()
     {
         return Ok(new
         {
-            message = "Admin access granted.",
+            message = "Librarian administrative access granted.",
             role = User.FindFirstValue(ClaimTypes.Role)
         });
     }
 }
-

@@ -1,4 +1,5 @@
-﻿using Library_Book_Lending.Models;
+﻿
+using Library_Book_Lending.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,19 +11,29 @@ public static class DbSeeder
     {
         var passwordHasher = new PasswordHasher<User>();
 
+
+        var formerAdmins = await context.Users
+            .Where(u => u.Role == (UserRole)3)
+            .ToListAsync();
+
+        foreach (var formerAdmin in formerAdmins)
+        {
+            formerAdmin.Role = UserRole.Librarian;
+        }
+
         var testAccounts = new[]
         {
             new User
             {
-                FullName = "Practice Admin",
+                FullName = "Librarian",
                 Email = "admin@library.com",
-                Role = UserRole.Admin,
+                Role = UserRole.Librarian,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
             },
             new User
             {
-                FullName = "Practice Librarian",
+                FullName = "Librarian",
                 Email = "librarian@library.com",
                 Role = UserRole.Librarian,
                 IsActive = true,
@@ -30,7 +41,7 @@ public static class DbSeeder
             },
             new User
             {
-                FullName = "Practice Member",
+                FullName = "Member",
                 Email = "member@library.com",
                 Role = UserRole.Member,
                 MemberNumber = "MEM-0001",
@@ -58,7 +69,6 @@ public static class DbSeeder
             context.Users.Add(account);
         }
 
-        // SEED SAMPLE BOOKS
         var sampleBooks = new[]
         {
             new Book { ISBN = "9780141439518", Title = "Pride and Prejudice", Author = "Jane Austen", Category = "Classic Fiction", PublishedYear = 1813, TotalCopies = 5, AvailableCopies = 5 },
@@ -110,7 +120,6 @@ public static class DbSeeder
             }
         }
 
-        // SEED SEATS
         if (!await context.Seats.AnyAsync())
         {
             var seats = new[]
@@ -130,7 +139,6 @@ public static class DbSeeder
             context.Seats.AddRange(seats);
         }
 
-        // SEED READING SPACES
         if (!await context.ReadingSpaces.AnyAsync())
         {
             var readingSpaces = new[]

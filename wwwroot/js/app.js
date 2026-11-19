@@ -298,8 +298,6 @@ document.getElementById("navigation").addEventListener("click", event => {
 
     openView(button.dataset.view);
 });
-// ASSIGNED TO: KIM — FRONTEND
-// PROJECT: Library Reservation Management System Practice
 
 const authSection = document.getElementById("authSection");
 const applicationSection = document.getElementById("applicationSection");

@@ -130,10 +130,10 @@ Swagger URL:
 
 Test accounts will be provided for each role to allow the evaluator to test the application.
 
-| Role | Email/Username | Password |
-|---|---|---|
-| Librarian | [Insert verified account] | [Insert password] |
-| Member | [Insert verified account] | [Insert password] |
+|			Role		|		Email/Username		|	  Password		|
+|			---			|			---				|		---			|
+|		 Librarian		|  [librarian@library.com]  |   [Library123!]	|
+|		   Member		|   [member@library.com]    |   [Library123!]	|
 
 Only verified test credentials should be included in this section.
 
@@ -141,13 +141,13 @@ Only verified test credentials should be included in this section.
 
 | Folder/File | Description |
 |---|---|
-| `Controllers/` | REST API controllers |
-| `Data/` | Database context and database seeding |
-| `DTOs/` | Data transfer objects |
-| `Models/` | Application models and enums |
-| `Migrations/` | Entity Framework Core migrations |
-| `wwwroot/` | HTML, CSS, and JavaScript frontend |
-| `Program.cs` | Application configuration and middleware |
+| `Controllers/` | REST API controllers						|
+| `Data/`		 | Database context and database seeding	|
+| `DTOs/`		 | Data transfer objects					|
+| `Models/`		 | Application models and enums				|
+| `Migrations/`  | Entity Framework Core migrations			|
+| `wwwroot/`	 | HTML, CSS, and JavaScript frontend		|
+| `Program.cs`	 | Application configuration and middleware |
 
 ## 13. Authentication and Authorization
 

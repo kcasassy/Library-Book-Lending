@@ -3,6 +3,5 @@
 public enum UserRole
 {
     Member = 1,
-    Librarian = 2,
-    Admin = 3
+    Librarian = 2
 }
