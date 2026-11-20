@@ -21,7 +21,7 @@ public class BorrowingsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin,Librarian")]
+    [Authorize(Roles = "Librarian")]
     public async Task<IActionResult> CreateBorrowing(BorrowingRequest request)
     {
         var staffIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -45,12 +45,12 @@ public class BorrowingsController : ControllerBase
             });
         }
 
-        if (member.MembershipExpiry.HasValue &&
+        if (!member.MembershipExpiry.HasValue ||
             member.MembershipExpiry.Value < DateTime.UtcNow)
         {
             return BadRequest(new
             {
-                message = "Member's membership has expired."
+                message = "Member does not have an active membership. Update the membership expiry first."
             });
         }
 
@@ -130,7 +130,7 @@ public class BorrowingsController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "Admin,Librarian")]
+    [Authorize(Roles = "Librarian")]
     public async Task<IActionResult> GetAllBorrowings()
     {
         await UpdateOverdueBorrowings();
@@ -158,7 +158,7 @@ public class BorrowingsController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    [Authorize(Roles = "Admin,Librarian")]
+    [Authorize(Roles = "Librarian")]
     public async Task<IActionResult> GetBorrowingById(int id)
     {
         await UpdateOverdueBorrowings();
@@ -230,7 +230,7 @@ public class BorrowingsController : ControllerBase
     }
 
     [HttpPut("{id:int}/return")]
-    [Authorize(Roles = "Admin,Librarian")]
+    [Authorize(Roles = "Librarian")]
     public async Task<IActionResult> ReturnBook(int id)
     {
         var borrowing = await _context.Borrowings
@@ -282,7 +282,7 @@ public class BorrowingsController : ControllerBase
     }
 
     [HttpGet("overdue")]
-    [Authorize(Roles = "Admin,Librarian")]
+    [Authorize(Roles = "Librarian")]
     public async Task<IActionResult> GetOverdueBorrowings()
     {
         await UpdateOverdueBorrowings();

@@ -16,7 +16,7 @@ Developed as part of the requirements for Integrative Programming and Technologi
 - Record borrowings and returns, and monitor overdue borrowings.
 - Manage seats, reading spaces, and their reservations.
 - Monitor QCPL external reservations.
-- View the member list and the summary report.
+- View members, update membership expiry and account status, and view the summary report.
 
 ### Member
 - Register and log in.

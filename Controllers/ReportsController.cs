@@ -9,7 +9,7 @@ namespace Library_Book_Lending.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin,Librarian")]
+[Authorize(Roles = "Librarian")]
 public class ReportsController : ControllerBase
 {
     private readonly LibraryDbContext _context;

@@ -62,6 +62,8 @@ public class AuthController : ControllerBase
             Email = email,
             Role = UserRole.Member,
             MemberNumber = memberNumber,
+            MembershipExpiry = DateTime.UtcNow.AddDays(
+                MembershipDefaults.DefaultDurationDays),
             IsActive = true,
             CreatedAt = DateTime.UtcNow
         };

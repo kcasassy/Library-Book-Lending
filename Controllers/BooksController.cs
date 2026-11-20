@@ -77,7 +77,7 @@ public class BooksController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin,Librarian")]
+    [Authorize(Roles = "Librarian")]
     public async Task<IActionResult> CreateBook(BookRequest request)
     {
         var isbn = request.ISBN.Trim();
@@ -138,7 +138,7 @@ public class BooksController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    [Authorize(Roles = "Admin,Librarian")]
+    [Authorize(Roles = "Librarian")]
     public async Task<IActionResult> UpdateBook(int id, BookRequest request)
     {
         var book = await _context.Books
@@ -201,7 +201,7 @@ public class BooksController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = "Admin,Librarian")]
+    [Authorize(Roles = "Librarian")]
     public async Task<IActionResult> DeactivateBook(int id)
     {
         var book = await _context.Books

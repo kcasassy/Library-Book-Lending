@@ -31,7 +31,7 @@ public class SeatReservationsController : ControllerBase
 
     private bool IsStaff()
     {
-        return User.IsInRole("Admin") || User.IsInRole("Librarian");
+        return User.IsInRole("Librarian");
     }
 
     private static DateTime NormalizeUtc(DateTime value)
@@ -217,7 +217,7 @@ public class SeatReservationsController : ControllerBase
     }
 
     [HttpPut("{id:int}/status")]
-    [Authorize(Roles = "Admin,Librarian")]
+    [Authorize(Roles = "Librarian")]
     public async Task<IActionResult> UpdateReservationStatus(
         int id,
         SeatReservationStatusRequest request)

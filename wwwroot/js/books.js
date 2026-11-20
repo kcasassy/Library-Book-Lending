@@ -25,7 +25,7 @@ function getBookRole() {
 
 function canManageBooks() {
     const role = getBookRole();
-    return role === "admin" || role === "librarian";
+    return role === "librarian";
 }
 
 function isMember() {

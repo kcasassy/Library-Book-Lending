@@ -11,16 +11,6 @@ public static class DbSeeder
     {
         var passwordHasher = new PasswordHasher<User>();
 
-
-        var formerAdmins = await context.Users
-            .Where(u => u.Role == (UserRole)3)
-            .ToListAsync();
-
-        foreach (var formerAdmin in formerAdmins)
-        {
-            formerAdmin.Role = UserRole.Librarian;
-        }
-
         var testAccounts = new[]
         {
             new User
@@ -45,6 +35,7 @@ public static class DbSeeder
                 Email = "member@library.com",
                 Role = UserRole.Member,
                 MemberNumber = "MEM-0001",
+                MembershipExpiry = DateTime.UtcNow.AddDays(MembershipDefaults.DefaultDurationDays),
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
             }
@@ -67,6 +58,16 @@ public static class DbSeeder
                 defaultPassword);
 
             context.Users.Add(account);
+        }
+
+        var membersWithoutExpiry = await context.Users
+            .Where(u => u.Role == UserRole.Member && u.MembershipExpiry == null)
+            .ToListAsync();
+
+        foreach (var member in membersWithoutExpiry)
+        {
+            member.MembershipExpiry = DateTime.UtcNow.AddDays(
+                MembershipDefaults.DefaultDurationDays);
         }
 
         var sampleBooks = new[]

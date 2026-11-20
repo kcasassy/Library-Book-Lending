@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Library_Book_Lending.Data;
 using Library_Book_Lending.DTOs;
+using Library_Book_Lending.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -72,6 +73,45 @@ public class UsersController : ControllerBase
             .ToListAsync();
 
         return Ok(users);
+    }
+
+    [HttpPut("{id:int}")]
+    [Authorize(Roles = "Librarian")]
+    public async Task<IActionResult> UpdateMember(int id, UpdateMemberRequest request)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+
+        if (user == null)
+        {
+            return NotFound(new { message = "User account not found." });
+        }
+
+        if (user.Role != UserRole.Member)
+        {
+            return BadRequest(new
+            {
+                message = "Only member accounts can be updated here."
+            });
+        }
+
+        user.MembershipExpiry = DateTime.SpecifyKind(
+            request.MembershipExpiry!.Value.Date.AddDays(1).AddTicks(-1),
+            DateTimeKind.Utc);
+        user.IsActive = request.IsActive;
+
+        await _context.SaveChangesAsync();
+
+        return Ok(new UserResponse
+        {
+            Id = user.Id,
+            FullName = user.FullName,
+            Email = user.Email,
+            Role = user.Role.ToString(),
+            MemberNumber = user.MemberNumber,
+            MembershipExpiry = user.MembershipExpiry,
+            IsActive = user.IsActive,
+            CreatedAt = user.CreatedAt
+        });
     }
 
     [HttpGet("staff")]

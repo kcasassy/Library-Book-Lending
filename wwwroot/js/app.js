@@ -70,14 +70,7 @@ function showApplication(user) {
     roleBadge.textContent = user.role || "User";
 
     document.querySelectorAll(".staff-only").forEach(element => {
-        element.classList.toggle(
-            "hidden",
-            !["admin", "librarian"].includes(role)
-        );
-    });
-
-    document.querySelectorAll(".admin-only").forEach(element => {
-        element.classList.toggle("hidden", role !== "admin");
+        element.classList.toggle("hidden", role !== "librarian");
     });
 
     openView("dashboard");
@@ -106,15 +99,11 @@ function isViewAllowed(viewName, role) {
     ];
 
     if (commonViews.includes(viewName)) {
-        return ["admin", "librarian", "member"].includes(role);
+        return ["librarian", "member"].includes(role);
     }
 
-    if (["qcpl", "reports"].includes(viewName)) {
-        return ["admin", "librarian"].includes(role);
-    }
-
-    if (viewName === "users") {
-        return role === "admin";
+    if (["qcpl", "reports", "users"].includes(viewName)) {
+        return role === "librarian";
     }
 
     return false;

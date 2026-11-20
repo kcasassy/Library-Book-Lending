@@ -123,7 +123,7 @@ public class SeatsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin,Librarian")]
+    [Authorize(Roles = "Librarian")]
     public async Task<IActionResult> CreateSeat(SeatRequest request)
     {
         var seatNumber = request.SeatNumber.Trim();
@@ -156,7 +156,7 @@ public class SeatsController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    [Authorize(Roles = "Admin,Librarian")]
+    [Authorize(Roles = "Librarian")]
     public async Task<IActionResult> UpdateSeat(int id, SeatRequest request)
     {
         var seat = await _context.Seats
@@ -188,7 +188,7 @@ public class SeatsController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = "Admin,Librarian")]
+    [Authorize(Roles = "Librarian")]
     public async Task<IActionResult> DeactivateSeat(int id)
     {
         var seat = await _context.Seats

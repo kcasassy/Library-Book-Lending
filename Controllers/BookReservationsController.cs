@@ -148,7 +148,7 @@ public class BookReservationsController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "Admin,Librarian")]
+    [Authorize(Roles = "Librarian")]
     public async Task<IActionResult> GetAllReservations()
     {
         var reservations = await _context.BookReservations
@@ -172,7 +172,7 @@ public class BookReservationsController : ControllerBase
     }
 
     [HttpPut("{id:int}/status")]
-    [Authorize(Roles = "Admin,Librarian")]
+    [Authorize(Roles = "Librarian")]
     public async Task<IActionResult> UpdateReservationStatus(
         int id,
         BookReservationStatusRequest request)
