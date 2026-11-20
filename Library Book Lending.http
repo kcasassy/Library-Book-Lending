@@ -1,6 +1,18 @@
 @Library_Book_Lending_HostAddress = http://localhost:5241
 
-GET {{Library_Book_Lending_HostAddress}}/weatherforecast/
+### Login (copy the token from the response)
+POST {{Library_Book_Lending_HostAddress}}/api/Auth/login
+Content-Type: application/json
+
+{
+  "email": "librarian@library.com",
+  "password": "Library123!"
+}
+
+### List books (replace YOUR_TOKEN with the token from the login response)
+GET {{Library_Book_Lending_HostAddress}}/api/Books
+Authorization: Bearer YOUR_TOKEN
 Accept: application/json
 
-###
+### Anonymous call: should return 401
+GET {{Library_Book_Lending_HostAddress}}/api/Users
