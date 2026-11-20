@@ -28,6 +28,28 @@ function clearAuthSession() {
     localStorage.removeItem("libraryUser");
 }
 
+function getValidationMessages(responseData) {
+    if (!responseData?.errors || typeof responseData.errors !== "object") {
+        return null;
+    }
+
+    const messages = Object.values(responseData.errors).flat();
+
+    return messages.length > 0 ? messages.join(" ") : null;
+}
+
+function handleExpiredSession() {
+    clearAuthSession();
+
+    if (typeof showLogin === "function") {
+        showLogin();
+    }
+
+    if (typeof showMessage === "function" && typeof authMessage !== "undefined") {
+        showMessage(authMessage, "Your session has expired. Please sign in again.", "error");
+    }
+}
+
 async function apiRequest(endpoint, options = {}) {
     const headers = new Headers(options.headers || {});
 
@@ -58,8 +80,22 @@ async function apiRequest(endpoint, options = {}) {
     }
 
     if (!response.ok) {
+        const isAuthEndpoint = endpoint.startsWith("/Auth/");
+
+        if (response.status === 401 && token && !isAuthEndpoint) {
+            handleExpiredSession();
+
+            const expiredError = new Error("Your session has expired. Please sign in again.");
+            expiredError.status = 401;
+            throw expiredError;
+        }
+
         const errorMessage =
+            (response.status === 403
+                ? "You do not have permission to perform this action."
+                : null) ||
             responseData?.message ||
+            getValidationMessages(responseData) ||
             responseData?.title ||
             (typeof responseData === "string" ? responseData : null) ||
             `Request failed with status ${response.status}.`;

@@ -55,6 +55,12 @@ builder.Services.AddCors(options =>
 var jwtKey = builder.Configuration["Jwt:Key"]
     ?? throw new InvalidOperationException("JWT Key is missing.");
 
+if (jwtKey.Trim().Length < 32)
+{
+    throw new InvalidOperationException(
+        "Jwt:Key must be at least 32 characters. See README section 6.2.");
+}
+
 var jwtIssuer = builder.Configuration["Jwt:Issuer"]
     ?? throw new InvalidOperationException("JWT Issuer is missing.");
 
