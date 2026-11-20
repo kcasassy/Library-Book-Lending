@@ -1,310 +1,185 @@
-﻿using Library_Book_Lending.DTOs;
-using Library_Book_Lending.Data;
+﻿using Library_Book_Lending.Data;
 using Library_Book_Lending.DTOs;
 using Library_Book_Lending.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace Library_Book_Lending.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class SeatReservationsController : ControllerBase
+public class ReadingSpacesController : ControllerBase
 {
     private readonly LibraryDbContext _context;
 
-    public SeatReservationsController(LibraryDbContext context)
+    public ReadingSpacesController(LibraryDbContext context)
     {
         _context = context;
     }
 
-    private int? GetUserId()
+    private static ReadingSpaceResponse ToResponse(ReadingSpace space)
     {
-        var value = User.FindFirstValue(ClaimTypes.NameIdentifier)
-                    ?? User.FindFirstValue("sub")
-                    ?? User.FindFirstValue("id");
-
-        return int.TryParse(value, out var id) ? id : null;
-    }
-
-    private bool IsStaff()
-    {
-        return User.IsInRole("Admin") || User.IsInRole("Librarian");
-    }
-
-    private static DateTime NormalizeUtc(DateTime value)
-    {
-        return value.Kind switch
+        return new ReadingSpaceResponse
         {
-            DateTimeKind.Utc => value,
-            DateTimeKind.Local => value.ToUniversalTime(),
-            _ => DateTime.SpecifyKind(value, DateTimeKind.Utc)
-        };
-    }
-
-    private static SeatReservationResponse ToResponse(SeatReservation reservation)
-    {
-        return new SeatReservationResponse
-        {
-            Id = reservation.Id,
-            UserId = reservation.UserId,
-            MemberName = reservation.User?.FullName,
-            SeatId = reservation.SeatId,
-            SeatNumber = reservation.Seat?.SeatNumber,
-            Location = reservation.Seat?.Location,
-            StartTime = DateTime.SpecifyKind(reservation.StartTime, DateTimeKind.Utc),
-            EndTime = DateTime.SpecifyKind(reservation.EndTime, DateTimeKind.Utc),
-            Status = reservation.Status
+            Id = space.Id,
+            Name = space.Name,
+            Location = space.Location,
+            Capacity = space.Capacity,
+            IsActive = space.IsActive
         };
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetReservations()
+    public async Task<ActionResult<IEnumerable<ReadingSpaceResponse>>> GetReadingSpaces()
     {
-        var userId = GetUserId();
-
-        if (userId == null)
-            return Unauthorized();
-
-        var query = _context.SeatReservations
-            .Include(r => r.Seat)
-            .Include(r => r.User)
-            .AsNoTracking()
-            .AsQueryable();
-
-        if (!IsStaff())
-            query = query.Where(r => r.UserId == userId.Value);
-
-        var reservations = await query
-            .OrderByDescending(r => r.StartTime)
+        var spaces = await _context.ReadingSpaces
+            .Where(s => s.IsActive)
+            .OrderBy(s => s.Name)
             .ToListAsync();
 
-        return Ok(reservations.Select(ToResponse));
-    }
-
-    [HttpGet("availability")]
-    public async Task<IActionResult> GetAvailableSeats(
-        [FromQuery] DateTime startTime,
-        [FromQuery] DateTime endTime)
-    {
-        startTime = NormalizeUtc(startTime);
-        endTime = NormalizeUtc(endTime);
-
-        if (startTime <= DateTime.UtcNow)
-            return BadRequest(new { message = "Reservation must be in the future." });
-
-        if (startTime >= endTime)
-            return BadRequest(new { message = "End time must be later than start time." });
-
-        var availableSeats = await _context.Seats
-            .AsNoTracking()
-            .Where(s => s.IsActive &&
-                !_context.SeatReservations.Any(r =>
-                    r.SeatId == s.Id &&
-                    (r.Status == "Pending" || r.Status == "Approved") &&
-                    r.StartTime < endTime &&
-                    r.EndTime > startTime))
-            .OrderBy(s => s.SeatNumber)
-            .Select(s => new SeatResponse
-            {
-                Id = s.Id,
-                SeatNumber = s.SeatNumber,
-                Location = s.Location,
-                IsActive = s.IsActive
-            })
-            .ToListAsync();
-
-        return Ok(availableSeats);
+        return Ok(spaces.Select(ToResponse));
     }
 
     [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetReservation(int id)
+    public async Task<ActionResult<ReadingSpaceResponse>> GetReadingSpace(int id)
     {
-        var userId = GetUserId();
+        var space = await _context.ReadingSpaces
+            .FirstOrDefaultAsync(s => s.Id == id && s.IsActive);
 
-        if (userId == null)
-            return Unauthorized();
+        if (space == null)
+        {
+            return NotFound(new { message = "Reading space not found." });
+        }
 
-        var reservation = await _context.SeatReservations
-            .Include(r => r.Seat)
-            .Include(r => r.User)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(r => r.Id == id);
-
-        if (reservation == null)
-            return NotFound(new { message = "Reservation not found." });
-
-        if (!IsStaff() && reservation.UserId != userId.Value)
-            return Forbid();
-
-        return Ok(ToResponse(reservation));
+        return Ok(ToResponse(space));
     }
 
     [HttpPost]
-    [Authorize(Roles = "Member")]
-    public async Task<IActionResult> CreateReservation(SeatReservationRequest request)
+    [Authorize(Roles = "Librarian")]
+    public async Task<ActionResult<ReadingSpaceResponse>> CreateReadingSpace(
+        ReadingSpaceRequest request)
     {
-        var userId = GetUserId();
+        var name = request.Name.Trim();
+        var location = request.Location.Trim();
 
-        if (userId == null)
-            return Unauthorized();
+        var duplicate = await _context.ReadingSpaces.AnyAsync(s =>
+            s.IsActive &&
+            s.Name.ToLower() == name.ToLower() &&
+            s.Location.ToLower() == location.ToLower());
 
-        var member = await _context.Users
-            .FirstOrDefaultAsync(u => u.Id == userId.Value);
-
-        if (member == null || !member.IsActive || member.Role != UserRole.Member)
-            return Forbid();
-
-        if (member.MembershipExpiry.HasValue &&
-            member.MembershipExpiry.Value.Date < DateTime.UtcNow.Date)
+        if (duplicate)
         {
-            return BadRequest(new { message = "Your membership has expired." });
-        }
-
-        var startTime = NormalizeUtc(request.StartTime);
-        var endTime = NormalizeUtc(request.EndTime);
-
-        if (startTime <= DateTime.UtcNow)
-            return BadRequest(new { message = "Reservation must be in the future." });
-
-        if (startTime >= endTime)
-            return BadRequest(new { message = "End time must be later than start time." });
-
-        var seat = await _context.Seats
-            .FirstOrDefaultAsync(s => s.Id == request.SeatId && s.IsActive);
-
-        if (seat == null)
-            return NotFound(new { message = "Seat not found or inactive." });
-
-        var conflict = await _context.SeatReservations.AnyAsync(r =>
-            r.SeatId == request.SeatId &&
-            (r.Status == "Pending" || r.Status == "Approved") &&
-            r.StartTime < endTime &&
-            r.EndTime > startTime);
-
-        if (conflict)
             return Conflict(new
             {
-                message = "Seat is already reserved for this schedule."
+                message = "A reading space with this name and location already exists."
             });
-
-        var reservation = new SeatReservation
-        {
-            UserId = userId.Value,
-            SeatId = request.SeatId,
-            StartTime = startTime,
-            EndTime = endTime,
-            Status = "Pending"
-        };
-
-        _context.SeatReservations.Add(reservation);
-        await _context.SaveChangesAsync();
-
-        await _context.Entry(reservation)
-            .Reference(r => r.Seat)
-            .LoadAsync();
-
-        await _context.Entry(reservation)
-            .Reference(r => r.User)
-            .LoadAsync();
-
-        return CreatedAtAction(
-            nameof(GetReservation),
-            new { id = reservation.Id },
-            ToResponse(reservation));
-    }
-
-    [HttpPut("{id:int}/status")]
-    [Authorize(Roles = "Admin,Librarian")]
-    public async Task<IActionResult> UpdateReservationStatus(
-        int id,
-        SeatReservationStatusRequest request)
-    {
-        var reservation = await _context.SeatReservations
-            .Include(r => r.Seat)
-            .Include(r => r.User)
-            .FirstOrDefaultAsync(r => r.Id == id);
-
-        if (reservation == null)
-            return NotFound(new { message = "Reservation not found." });
-
-        if (reservation.Status != "Pending")
-            return BadRequest(new
-            {
-                message = "Only pending reservations can be approved or rejected."
-            });
-
-        if (request.Status == "Approved")
-        {
-            if (reservation.EndTime <= DateTime.UtcNow)
-                return BadRequest(new
-                {
-                    message = "Cannot approve a reservation that has already ended."
-                });
-
-            var conflict = await _context.SeatReservations.AnyAsync(r =>
-                r.Id != id &&
-                r.SeatId == reservation.SeatId &&
-                (r.Status == "Pending" || r.Status == "Approved") &&
-                r.StartTime < reservation.EndTime &&
-                r.EndTime > reservation.StartTime);
-
-            if (conflict)
-                return Conflict(new
-                {
-                    message = "Another active reservation conflicts with this schedule."
-                });
         }
 
-        reservation.Status = request.Status;
+        var space = new ReadingSpace
+        {
+            Name = name,
+            Location = location,
+            Capacity = request.Capacity,
+            IsActive = true
+        };
 
+        _context.ReadingSpaces.Add(space);
         await _context.SaveChangesAsync();
 
-        return Ok(new
-        {
-            message = $"Reservation {request.Status.ToLowerInvariant()} successfully.",
-            reservation = ToResponse(reservation)
-        });
+        return CreatedAtAction(
+            nameof(GetReadingSpace),
+            new { id = space.Id },
+            ToResponse(space));
     }
 
-    [HttpPut("{id:int}/cancel")]
-    [Authorize(Roles = "Member")]
-    public async Task<IActionResult> CancelReservation(int id)
+    [HttpPut("{id:int}")]
+    [Authorize(Roles = "Librarian")]
+    public async Task<ActionResult<ReadingSpaceResponse>> UpdateReadingSpace(
+        int id,
+        ReadingSpaceRequest request)
     {
-        var userId = GetUserId();
+        var space = await _context.ReadingSpaces
+            .FirstOrDefaultAsync(s => s.Id == id && s.IsActive);
 
-        if (userId == null)
-            return Unauthorized();
+        if (space == null)
+        {
+            return NotFound(new { message = "Reading space not found." });
+        }
 
-        var reservation = await _context.SeatReservations
-            .Include(r => r.Seat)
-            .Include(r => r.User)
-            .FirstOrDefaultAsync(r => r.Id == id);
+        var name = request.Name.Trim();
+        var location = request.Location.Trim();
 
-        if (reservation == null)
-            return NotFound(new { message = "Reservation not found." });
+        var duplicate = await _context.ReadingSpaces.AnyAsync(s =>
+            s.Id != id &&
+            s.IsActive &&
+            s.Name.ToLower() == name.ToLower() &&
+            s.Location.ToLower() == location.ToLower());
 
-        if (reservation.UserId != userId.Value)
-            return Forbid();
+        if (duplicate)
+        {
+            return Conflict(new
+            {
+                message = "A reading space with this name and location already exists."
+            });
+        }
 
-        if (reservation.Status != "Pending")
+        var hasOversizedReservation = await _context.ReadingSpaceReservations
+            .AnyAsync(r =>
+                r.ReadingSpaceId == id &&
+                (r.Status == "Pending" || r.Status == "Approved") &&
+                r.NumberOfPeople > request.Capacity);
+
+        if (hasOversizedReservation)
+        {
             return BadRequest(new
             {
-                message = "Only pending reservations can be cancelled."
+                message = "Capacity cannot be lower than the number of people in an active reservation."
             });
+        }
 
-        reservation.Status = "Cancelled";
+        space.Name = name;
+        space.Location = location;
+        space.Capacity = request.Capacity;
 
+        await _context.SaveChangesAsync();
+
+        return Ok(ToResponse(space));
+    }
+
+    [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Librarian")]
+    public async Task<IActionResult> DeactivateReadingSpace(int id)
+    {
+        var space = await _context.ReadingSpaces
+            .FirstOrDefaultAsync(s => s.Id == id && s.IsActive);
+
+        if (space == null)
+        {
+            return NotFound(new { message = "Reading space not found." });
+        }
+
+        var hasActiveReservations = await _context.ReadingSpaceReservations
+            .AnyAsync(r =>
+                r.ReadingSpaceId == id &&
+                (r.Status == "Pending" || r.Status == "Approved") &&
+                r.EndTime > DateTime.UtcNow);
+
+        if (hasActiveReservations)
+        {
+            return Conflict(new
+            {
+                message = "This reading space cannot be deactivated while it has pending or approved future reservations."
+            });
+        }
+
+        space.IsActive = false;
         await _context.SaveChangesAsync();
 
         return Ok(new
         {
-            message = "Reservation cancelled successfully.",
-            reservation = ToResponse(reservation)
+            message = "Reading space deactivated successfully."
         });
     }
 }
-

@@ -76,11 +76,27 @@ Before running the project, install:
 2. Open the project or solution in Visual Studio 2022.
 3. Restore the NuGet packages.
 4. Configure the database connection string.
-5. Configure the JWT settings.
+5. Configure the JWT signing key using Visual Studio User Secrets.
+
+   To configure the JWT key:
+
+   - Right-click the API project in Solution Explorer.
+   - Select **Manage User Secrets**.
+   - Add the following configuration to `secrets.json`:
+
+   ```json
+   {
+     "Jwt": {
+       "Key": "YOUR_LOCAL_SECRET_KEY_HERE"
+     }
+   }
+   ```
+
+   Generate your own secret key of at least 32 characters. Do not commit your actual JWT key to GitHub.
+
 6. Apply the database migrations.
 7. Build the project.
 8. Run the application.
-
 ## 7. Database Setup
 
 The application uses Entity Framework Core with SQL Server or SQL Server LocalDB.
@@ -173,3 +189,4 @@ Contribution details are documented in `CONTRIBUTIONS.md`.
 ## 16. Academic Purpose
 
 This application is developed for academic purposes as part of the Integrative Programming and Technologies I course requirements.
+

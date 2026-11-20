@@ -17,474 +17,474 @@ namespace Library_Book_Lending.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.11")
+                .HasAnnotation("ProductVersion", "8.0.34")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Library_Book_Lending.Models.Book", b =>
-            {
-                b.Property<int>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("int");
-
-                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                b.Property<string>("Author")
-                    .IsRequired()
-                    .HasMaxLength(150)
-                    .HasColumnType("nvarchar(150)");
-
-                b.Property<int>("AvailableCopies")
-                    .HasColumnType("int");
-
-                b.Property<string>("Category")
-                    .IsRequired()
-                    .HasMaxLength(100)
-                    .HasColumnType("nvarchar(100)");
-
-                b.Property<DateTime>("CreatedAt")
-                    .HasColumnType("datetime2");
-
-                b.Property<string>("ISBN")
-                    .IsRequired()
-                    .HasMaxLength(30)
-                    .HasColumnType("nvarchar(30)");
-
-                b.Property<bool>("IsActive")
-                    .HasColumnType("bit");
-
-                b.Property<int?>("PublishedYear")
-                    .HasColumnType("int");
-
-                b.Property<string>("Title")
-                    .IsRequired()
-                    .HasMaxLength(200)
-                    .HasColumnType("nvarchar(200)");
-
-                b.Property<int>("TotalCopies")
-                    .HasColumnType("int");
-
-                b.HasKey("Id");
-
-                b.HasIndex("ISBN")
-                    .IsUnique();
-
-                b.ToTable("Books", t =>
                 {
-                    t.HasCheckConstraint("CK_Books_AvailableCopies", "[AvailableCopies] >= 0 AND [AvailableCopies] <= [TotalCopies]");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Author")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("AvailableCopies")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ISBN")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("PublishedYear")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("TotalCopies")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ISBN")
+                        .IsUnique();
+
+                    b.ToTable("Books", t =>
+                        {
+                            t.HasCheckConstraint("CK_Books_AvailableCopies", "[AvailableCopies] >= 0 AND [AvailableCopies] <= [TotalCopies]");
+                        });
                 });
-            });
 
             modelBuilder.Entity("Library_Book_Lending.Models.BookReservation", b =>
-            {
-                b.Property<int>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("int");
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                b.Property<int>("BookId")
-                    .HasColumnType("int");
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
 
-                b.Property<DateTime?>("ExpiresAt")
-                    .HasColumnType("datetime2");
+                    b.Property<DateTime?>("ExpiresAt")
+                        .HasColumnType("datetime2");
 
-                b.Property<DateTime>("ReservedAt")
-                    .HasColumnType("datetime2");
+                    b.Property<DateTime>("ReservedAt")
+                        .HasColumnType("datetime2");
 
-                b.Property<string>("Status")
-                    .IsRequired()
-                    .HasMaxLength(30)
-                    .HasColumnType("nvarchar(30)");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
-                b.Property<int>("UserId")
-                    .HasColumnType("int");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
-                b.HasKey("Id");
+                    b.HasKey("Id");
 
-                b.HasIndex("BookId");
+                    b.HasIndex("BookId");
 
-                b.HasIndex("UserId");
+                    b.HasIndex("UserId");
 
-                b.ToTable("BookReservations");
-            });
+                    b.ToTable("BookReservations");
+                });
 
             modelBuilder.Entity("Library_Book_Lending.Models.Borrowing", b =>
-            {
-                b.Property<int>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("int");
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                b.Property<int>("BookId")
-                    .HasColumnType("int");
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
 
-                b.Property<DateTime>("BorrowedAt")
-                    .HasColumnType("datetime2");
+                    b.Property<DateTime>("BorrowedAt")
+                        .HasColumnType("datetime2");
 
-                b.Property<DateTime>("DueDate")
-                    .HasColumnType("datetime2");
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
 
-                b.Property<int?>("ProcessedById")
-                    .HasColumnType("int");
+                    b.Property<int?>("ProcessedById")
+                        .HasColumnType("int");
 
-                b.Property<DateTime?>("ReturnedAt")
-                    .HasColumnType("datetime2");
+                    b.Property<DateTime?>("ReturnedAt")
+                        .HasColumnType("datetime2");
 
-                b.Property<int>("Status")
-                    .HasColumnType("int");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
-                b.Property<int>("UserId")
-                    .HasColumnType("int");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
-                b.HasKey("Id");
+                    b.HasKey("Id");
 
-                b.HasIndex("BookId");
+                    b.HasIndex("BookId");
 
-                b.HasIndex("ProcessedById");
+                    b.HasIndex("ProcessedById");
 
-                b.HasIndex("UserId");
+                    b.HasIndex("UserId");
 
-                b.ToTable("Borrowings");
-            });
+                    b.ToTable("Borrowings");
+                });
 
             modelBuilder.Entity("Library_Book_Lending.Models.QcplExternalReservation", b =>
-            {
-                b.Property<int>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("int");
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                b.Property<string>("BookTitle")
-                    .IsRequired()
-                    .HasMaxLength(200)
-                    .HasColumnType("nvarchar(200)");
+                    b.Property<string>("BookTitle")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
-                b.Property<DateTime>("CreatedAt")
-                    .HasColumnType("datetime2");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
-                b.Property<string>("ExternalReferenceNumber")
-                    .IsRequired()
-                    .HasMaxLength(100)
-                    .HasColumnType("nvarchar(100)");
+                    b.Property<string>("ExternalReferenceNumber")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                b.Property<DateTime?>("LastSyncedAt")
-                    .HasColumnType("datetime2");
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("datetime2");
 
-                b.Property<string>("MemberName")
-                    .IsRequired()
-                    .HasMaxLength(150)
-                    .HasColumnType("nvarchar(150)");
+                    b.Property<string>("MemberName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
-                b.Property<string>("Notes")
-                    .HasMaxLength(500)
-                    .HasColumnType("nvarchar(500)");
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
-                b.Property<DateTime>("ReservationDate")
-                    .HasColumnType("datetime2");
+                    b.Property<DateTime>("ReservationDate")
+                        .HasColumnType("datetime2");
 
-                b.Property<string>("ReservationStatus")
-                    .IsRequired()
-                    .HasMaxLength(50)
-                    .HasColumnType("nvarchar(50)");
+                    b.Property<string>("ReservationStatus")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
-                b.HasKey("Id");
+                    b.HasKey("Id");
 
-                b.HasIndex("ExternalReferenceNumber")
-                    .IsUnique();
+                    b.HasIndex("ExternalReferenceNumber")
+                        .IsUnique();
 
-                b.ToTable("QcplExternalReservations");
-            });
+                    b.ToTable("QcplExternalReservations");
+                });
 
             modelBuilder.Entity("Library_Book_Lending.Models.ReadingSpace", b =>
-            {
-                b.Property<int>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("int");
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                b.Property<int>("Capacity")
-                    .HasColumnType("int");
+                    b.Property<int>("Capacity")
+                        .HasColumnType("int");
 
-                b.Property<bool>("IsActive")
-                    .HasColumnType("bit");
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
-                b.Property<string>("Location")
-                    .IsRequired()
-                    .HasMaxLength(150)
-                    .HasColumnType("nvarchar(150)");
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
-                b.Property<string>("Name")
-                    .IsRequired()
-                    .HasMaxLength(150)
-                    .HasColumnType("nvarchar(150)");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
-                b.HasKey("Id");
+                    b.HasKey("Id");
 
-                b.ToTable("ReadingSpaces");
-            });
+                    b.ToTable("ReadingSpaces");
+                });
 
             modelBuilder.Entity("Library_Book_Lending.Models.ReadingSpaceReservation", b =>
-            {
-                b.Property<int>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("int");
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                b.Property<DateTime>("EndTime")
-                    .HasColumnType("datetime2");
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("datetime2");
 
-                b.Property<int>("NumberOfPeople")
-                    .HasColumnType("int");
+                    b.Property<int>("NumberOfPeople")
+                        .HasColumnType("int");
 
-                b.Property<int>("ReadingSpaceId")
-                    .HasColumnType("int");
+                    b.Property<int>("ReadingSpaceId")
+                        .HasColumnType("int");
 
-                b.Property<DateTime>("StartTime")
-                    .HasColumnType("datetime2");
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2");
 
-                b.Property<string>("Status")
-                    .IsRequired()
-                    .HasMaxLength(30)
-                    .HasColumnType("nvarchar(30)");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
-                b.Property<int>("UserId")
-                    .HasColumnType("int");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
-                b.HasKey("Id");
+                    b.HasKey("Id");
 
-                b.HasIndex("ReadingSpaceId");
+                    b.HasIndex("ReadingSpaceId");
 
-                b.HasIndex("UserId");
+                    b.HasIndex("UserId");
 
-                b.ToTable("ReadingSpaceReservations");
-            });
+                    b.ToTable("ReadingSpaceReservations");
+                });
 
             modelBuilder.Entity("Library_Book_Lending.Models.Seat", b =>
-            {
-                b.Property<int>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("int");
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                b.Property<bool>("IsActive")
-                    .HasColumnType("bit");
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
-                b.Property<string>("Location")
-                    .IsRequired()
-                    .HasMaxLength(100)
-                    .HasColumnType("nvarchar(100)");
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                b.Property<string>("SeatNumber")
-                    .IsRequired()
-                    .HasMaxLength(30)
-                    .HasColumnType("nvarchar(30)");
+                    b.Property<string>("SeatNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
-                b.HasKey("Id");
+                    b.HasKey("Id");
 
-                b.ToTable("Seats");
-            });
+                    b.ToTable("Seats");
+                });
 
             modelBuilder.Entity("Library_Book_Lending.Models.SeatReservation", b =>
-            {
-                b.Property<int>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("int");
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                b.Property<DateTime>("EndTime")
-                    .HasColumnType("datetime2");
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("datetime2");
 
-                b.Property<int>("SeatId")
-                    .HasColumnType("int");
+                    b.Property<int>("SeatId")
+                        .HasColumnType("int");
 
-                b.Property<DateTime>("StartTime")
-                    .HasColumnType("datetime2");
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2");
 
-                b.Property<string>("Status")
-                    .IsRequired()
-                    .HasMaxLength(30)
-                    .HasColumnType("nvarchar(30)");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
-                b.Property<int>("UserId")
-                    .HasColumnType("int");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
-                b.HasKey("Id");
+                    b.HasKey("Id");
 
-                b.HasIndex("SeatId");
+                    b.HasIndex("SeatId");
 
-                b.HasIndex("UserId");
+                    b.HasIndex("UserId");
 
-                b.ToTable("SeatReservations");
-            });
+                    b.ToTable("SeatReservations");
+                });
 
             modelBuilder.Entity("Library_Book_Lending.Models.User", b =>
-            {
-                b.Property<int>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("int");
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                b.Property<DateTime>("CreatedAt")
-                    .HasColumnType("datetime2");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
-                b.Property<string>("Email")
-                    .IsRequired()
-                    .HasMaxLength(150)
-                    .HasColumnType("nvarchar(150)");
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
-                b.Property<string>("FullName")
-                    .IsRequired()
-                    .HasMaxLength(150)
-                    .HasColumnType("nvarchar(150)");
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
-                b.Property<bool>("IsActive")
-                    .HasColumnType("bit");
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
-                b.Property<string>("MemberNumber")
-                    .HasMaxLength(50)
-                    .HasColumnType("nvarchar(50)");
+                    b.Property<string>("MemberNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
-                b.Property<DateTime?>("MembershipExpiry")
-                    .HasColumnType("datetime2");
+                    b.Property<DateTime?>("MembershipExpiry")
+                        .HasColumnType("datetime2");
 
-                b.Property<string>("PasswordHash")
-                    .IsRequired()
-                    .HasColumnType("nvarchar(max)");
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                b.Property<int>("Role")
-                    .HasColumnType("int");
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
 
-                b.HasKey("Id");
+                    b.HasKey("Id");
 
-                b.HasIndex("Email")
-                    .IsUnique();
+                    b.HasIndex("Email")
+                        .IsUnique();
 
-                b.HasIndex("MemberNumber")
-                    .IsUnique()
-                    .HasFilter("[MemberNumber] IS NOT NULL");
+                    b.HasIndex("MemberNumber")
+                        .IsUnique()
+                        .HasFilter("[MemberNumber] IS NOT NULL");
 
-                b.ToTable("Users");
-            });
+                    b.ToTable("Users");
+                });
 
             modelBuilder.Entity("Library_Book_Lending.Models.BookReservation", b =>
-            {
-                b.HasOne("Library_Book_Lending.Models.Book", "Book")
-                    .WithMany("Reservations")
-                    .HasForeignKey("BookId")
-                    .OnDelete(DeleteBehavior.Restrict)
-                    .IsRequired();
+                {
+                    b.HasOne("Library_Book_Lending.Models.Book", "Book")
+                        .WithMany("Reservations")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                b.HasOne("Library_Book_Lending.Models.User", "User")
-                    .WithMany("BookReservations")
-                    .HasForeignKey("UserId")
-                    .OnDelete(DeleteBehavior.Restrict)
-                    .IsRequired();
+                    b.HasOne("Library_Book_Lending.Models.User", "User")
+                        .WithMany("BookReservations")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                b.Navigation("Book");
+                    b.Navigation("Book");
 
-                b.Navigation("User");
-            });
+                    b.Navigation("User");
+                });
 
             modelBuilder.Entity("Library_Book_Lending.Models.Borrowing", b =>
-            {
-                b.HasOne("Library_Book_Lending.Models.Book", "Book")
-                    .WithMany("Borrowings")
-                    .HasForeignKey("BookId")
-                    .OnDelete(DeleteBehavior.Restrict)
-                    .IsRequired();
+                {
+                    b.HasOne("Library_Book_Lending.Models.Book", "Book")
+                        .WithMany("Borrowings")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                b.HasOne("Library_Book_Lending.Models.User", "ProcessedBy")
-                    .WithMany()
-                    .HasForeignKey("ProcessedById")
-                    .OnDelete(DeleteBehavior.Restrict);
+                    b.HasOne("Library_Book_Lending.Models.User", "ProcessedBy")
+                        .WithMany()
+                        .HasForeignKey("ProcessedById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
-                b.HasOne("Library_Book_Lending.Models.User", "User")
-                    .WithMany("Borrowings")
-                    .HasForeignKey("UserId")
-                    .OnDelete(DeleteBehavior.Restrict)
-                    .IsRequired();
+                    b.HasOne("Library_Book_Lending.Models.User", "User")
+                        .WithMany("Borrowings")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                b.Navigation("Book");
+                    b.Navigation("Book");
 
-                b.Navigation("ProcessedBy");
+                    b.Navigation("ProcessedBy");
 
-                b.Navigation("User");
-            });
+                    b.Navigation("User");
+                });
 
             modelBuilder.Entity("Library_Book_Lending.Models.ReadingSpaceReservation", b =>
-            {
-                b.HasOne("Library_Book_Lending.Models.ReadingSpace", "ReadingSpace")
-                    .WithMany("Reservations")
-                    .HasForeignKey("ReadingSpaceId")
-                    .OnDelete(DeleteBehavior.Restrict)
-                    .IsRequired();
+                {
+                    b.HasOne("Library_Book_Lending.Models.ReadingSpace", "ReadingSpace")
+                        .WithMany("Reservations")
+                        .HasForeignKey("ReadingSpaceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                b.HasOne("Library_Book_Lending.Models.User", "User")
-                    .WithMany("ReadingSpaceReservations")
-                    .HasForeignKey("UserId")
-                    .OnDelete(DeleteBehavior.Restrict)
-                    .IsRequired();
+                    b.HasOne("Library_Book_Lending.Models.User", "User")
+                        .WithMany("ReadingSpaceReservations")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                b.Navigation("ReadingSpace");
+                    b.Navigation("ReadingSpace");
 
-                b.Navigation("User");
-            });
+                    b.Navigation("User");
+                });
 
             modelBuilder.Entity("Library_Book_Lending.Models.SeatReservation", b =>
-            {
-                b.HasOne("Library_Book_Lending.Models.Seat", "Seat")
-                    .WithMany("Reservations")
-                    .HasForeignKey("SeatId")
-                    .OnDelete(DeleteBehavior.Restrict)
-                    .IsRequired();
+                {
+                    b.HasOne("Library_Book_Lending.Models.Seat", "Seat")
+                        .WithMany("Reservations")
+                        .HasForeignKey("SeatId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                b.HasOne("Library_Book_Lending.Models.User", "User")
-                    .WithMany("SeatReservations")
-                    .HasForeignKey("UserId")
-                    .OnDelete(DeleteBehavior.Restrict)
-                    .IsRequired();
+                    b.HasOne("Library_Book_Lending.Models.User", "User")
+                        .WithMany("SeatReservations")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                b.Navigation("Seat");
+                    b.Navigation("Seat");
 
-                b.Navigation("User");
-            });
+                    b.Navigation("User");
+                });
 
             modelBuilder.Entity("Library_Book_Lending.Models.Book", b =>
-            {
-                b.Navigation("Borrowings");
+                {
+                    b.Navigation("Borrowings");
 
-                b.Navigation("Reservations");
-            });
+                    b.Navigation("Reservations");
+                });
 
             modelBuilder.Entity("Library_Book_Lending.Models.ReadingSpace", b =>
-            {
-                b.Navigation("Reservations");
-            });
+                {
+                    b.Navigation("Reservations");
+                });
 
             modelBuilder.Entity("Library_Book_Lending.Models.Seat", b =>
-            {
-                b.Navigation("Reservations");
-            });
+                {
+                    b.Navigation("Reservations");
+                });
 
             modelBuilder.Entity("Library_Book_Lending.Models.User", b =>
-            {
-                b.Navigation("BookReservations");
+                {
+                    b.Navigation("BookReservations");
 
-                b.Navigation("Borrowings");
+                    b.Navigation("Borrowings");
 
-                b.Navigation("ReadingSpaceReservations");
+                    b.Navigation("ReadingSpaceReservations");
 
-                b.Navigation("SeatReservations");
-            });
+                    b.Navigation("SeatReservations");
+                });
 #pragma warning restore 612, 618
         }
     }

@@ -5,7 +5,6 @@ using Library_Book_Lending.Data;
 using Library_Book_Lending.DTOs;
 using Library_Book_Lending.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -29,7 +28,8 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register(RegisterRequest request)
+    public async Task<IActionResult> Register(
+        Library_Book_Lending.DTOs.RegisterRequest request)
     {
         var email = request.Email.Trim().ToLowerInvariant();
 
@@ -84,7 +84,8 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login(LoginRequest request)
+    public async Task<IActionResult> Login(
+        Library_Book_Lending.DTOs.LoginRequest request)
     {
         var email = request.Email.Trim().ToLowerInvariant();
 

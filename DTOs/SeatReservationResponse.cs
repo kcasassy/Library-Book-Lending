@@ -1,4 +1,4 @@
-﻿namespace Library_Book_Lending.DTOs
+﻿namespace Library_Book_Lending.DTOs;
 public class SeatReservationResponse
 {
     public int Id { get; set; }

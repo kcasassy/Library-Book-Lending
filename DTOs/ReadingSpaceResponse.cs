@@ -1,16 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace Library_Book_Lending.DTOs;
 
-namespace Library_Book_Lending.DTOs;
-public class ReadingSpaceRequest
+public class ReadingSpaceResponse
 {
-    [Required]
-    [StringLength(100)]
+    public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
-
-    [Required]
-    [StringLength(100)]
     public string Location { get; set; } = string.Empty;
-
-    [Range(1, 500)]
     public int Capacity { get; set; }
+    public bool IsActive { get; set; }
 }
