@@ -1,6 +1,5 @@
 ﻿using Library_Book_Lending.DTOs;
 using Library_Book_Lending.Data;
-using Library_Book_Lending.DTOs;
 using Library_Book_Lending.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
