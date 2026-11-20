@@ -42,7 +42,7 @@ public class SeatsController : ControllerBase
             .AsNoTracking()
             .Where(r =>
                 seatIds.Contains(r.SeatId) &&
-                (r.Status == "Pending" || r.Status == "Approved") &&
+                (r.Status == ReservationStatuses.Pending || r.Status == ReservationStatuses.Approved) &&
                 r.EndTime > now)
             .OrderBy(r => r.StartTime)
             .Select(r => new
@@ -100,7 +100,7 @@ public class SeatsController : ControllerBase
             .AsNoTracking()
             .Where(r =>
                 r.SeatId == id &&
-                (r.Status == "Pending" || r.Status == "Approved") &&
+                (r.Status == ReservationStatuses.Pending || r.Status == ReservationStatuses.Approved) &&
                 r.EndTime > now)
             .OrderBy(r => r.StartTime)
             .Select(r => new
@@ -203,7 +203,7 @@ public class SeatsController : ControllerBase
         var hasActiveReservations = await _context.SeatReservations
             .AnyAsync(r =>
                 r.SeatId == id &&
-                (r.Status == "Pending" || r.Status == "Approved") &&
+                (r.Status == ReservationStatuses.Pending || r.Status == ReservationStatuses.Approved) &&
                 r.EndTime > DateTime.UtcNow);
 
         if (hasActiveReservations)

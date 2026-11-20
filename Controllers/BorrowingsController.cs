@@ -1,10 +1,12 @@
-﻿using System.Security.Claims;
+﻿using System.Linq.Expressions;
+using System.Security.Claims;
 using Library_Book_Lending.Data;
 using Library_Book_Lending.DTOs;
 using Library_Book_Lending.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Library_Book_Lending.Controllers;
 
@@ -13,11 +15,31 @@ namespace Library_Book_Lending.Controllers;
 [Authorize]
 public class BorrowingsController : ControllerBase
 {
-    private readonly LibraryDbContext _context;
+    private static readonly Expression<Func<Borrowing, BorrowingResponse>> ToBorrowingResponse =
+        b => new BorrowingResponse
+        {
+            Id = b.Id,
+            UserId = b.UserId,
+            MemberName = b.User != null ? b.User.FullName : string.Empty,
+            BookId = b.BookId,
+            BookTitle = b.Book != null ? b.Book.Title : string.Empty,
+            ISBN = b.Book != null ? b.Book.ISBN : string.Empty,
+            ProcessedById = b.ProcessedById,
+            BorrowedAt = b.BorrowedAt,
+            DueDate = b.DueDate,
+            ReturnedAt = b.ReturnedAt,
+            Status = b.Status.ToString()
+        };
 
-    public BorrowingsController(LibraryDbContext context)
+    private readonly LibraryDbContext _context;
+    private readonly LibrarySettings _settings;
+
+    public BorrowingsController(
+        LibraryDbContext context,
+        IOptions<LibrarySettings> settings)
     {
         _context = context;
+        _settings = settings.Value;
     }
 
     [HttpPost]
@@ -98,7 +120,7 @@ public class BorrowingsController : ControllerBase
             BookId = book.Id,
             ProcessedById = staffId,
             BorrowedAt = now,
-            DueDate = now.AddDays(14),
+            DueDate = now.AddDays(_settings.LoanDays),
             Status = BorrowingStatus.Borrowed
         };
 
@@ -138,20 +160,7 @@ public class BorrowingsController : ControllerBase
         var borrowings = await _context.Borrowings
             .AsNoTracking()
             .OrderByDescending(b => b.BorrowedAt)
-            .Select(b => new BorrowingResponse
-            {
-                Id = b.Id,
-                UserId = b.UserId,
-                MemberName = b.User != null ? b.User.FullName : string.Empty,
-                BookId = b.BookId,
-                BookTitle = b.Book != null ? b.Book.Title : string.Empty,
-                ISBN = b.Book != null ? b.Book.ISBN : string.Empty,
-                ProcessedById = b.ProcessedById,
-                BorrowedAt = b.BorrowedAt,
-                DueDate = b.DueDate,
-                ReturnedAt = b.ReturnedAt,
-                Status = b.Status.ToString()
-            })
+            .Select(ToBorrowingResponse)
             .ToListAsync();
 
         return Ok(borrowings);
@@ -166,20 +175,7 @@ public class BorrowingsController : ControllerBase
         var borrowing = await _context.Borrowings
             .AsNoTracking()
             .Where(b => b.Id == id)
-            .Select(b => new BorrowingResponse
-            {
-                Id = b.Id,
-                UserId = b.UserId,
-                MemberName = b.User != null ? b.User.FullName : string.Empty,
-                BookId = b.BookId,
-                BookTitle = b.Book != null ? b.Book.Title : string.Empty,
-                ISBN = b.Book != null ? b.Book.ISBN : string.Empty,
-                ProcessedById = b.ProcessedById,
-                BorrowedAt = b.BorrowedAt,
-                DueDate = b.DueDate,
-                ReturnedAt = b.ReturnedAt,
-                Status = b.Status.ToString()
-            })
+            .Select(ToBorrowingResponse)
             .FirstOrDefaultAsync();
 
         if (borrowing == null)
@@ -210,20 +206,7 @@ public class BorrowingsController : ControllerBase
             .AsNoTracking()
             .Where(b => b.UserId == userId)
             .OrderByDescending(b => b.BorrowedAt)
-            .Select(b => new BorrowingResponse
-            {
-                Id = b.Id,
-                UserId = b.UserId,
-                MemberName = b.User != null ? b.User.FullName : string.Empty,
-                BookId = b.BookId,
-                BookTitle = b.Book != null ? b.Book.Title : string.Empty,
-                ISBN = b.Book != null ? b.Book.ISBN : string.Empty,
-                ProcessedById = b.ProcessedById,
-                BorrowedAt = b.BorrowedAt,
-                DueDate = b.DueDate,
-                ReturnedAt = b.ReturnedAt,
-                Status = b.Status.ToString()
-            })
+            .Select(ToBorrowingResponse)
             .ToListAsync();
 
         return Ok(borrowings);
@@ -291,20 +274,7 @@ public class BorrowingsController : ControllerBase
             .AsNoTracking()
             .Where(b => b.Status == BorrowingStatus.Overdue)
             .OrderBy(b => b.DueDate)
-            .Select(b => new BorrowingResponse
-            {
-                Id = b.Id,
-                UserId = b.UserId,
-                MemberName = b.User != null ? b.User.FullName : string.Empty,
-                BookId = b.BookId,
-                BookTitle = b.Book != null ? b.Book.Title : string.Empty,
-                ISBN = b.Book != null ? b.Book.ISBN : string.Empty,
-                ProcessedById = b.ProcessedById,
-                BorrowedAt = b.BorrowedAt,
-                DueDate = b.DueDate,
-                ReturnedAt = b.ReturnedAt,
-                Status = b.Status.ToString()
-            })
+            .Select(ToBorrowingResponse)
             .ToListAsync();
 
         return Ok(overdueBorrowings);

@@ -23,7 +23,7 @@ public class SeatReservation
 
     [Required]
     [MaxLength(20)]
-    public string Status { get; set; } = "Pending";
+    public string Status { get; set; } = ReservationStatuses.Pending;
 
     [ForeignKey(nameof(UserId))]
     public User? User { get; set; }

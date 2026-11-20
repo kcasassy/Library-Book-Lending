@@ -114,36 +114,6 @@ public class UsersController : ControllerBase
         });
     }
 
-    [HttpGet("staff")]
-    [Authorize(Roles = "Librarian")]
-    public IActionResult StaffAccess()
-    {
-        return Ok(new
-        {
-            message = "Librarian access granted.",
-            role = User.FindFirstValue(ClaimTypes.Role)
-        });
-    }
 
-    [HttpGet("member")]
-    [Authorize(Roles = "Member")]
-    public IActionResult MemberAccess()
-    {
-        return Ok(new
-        {
-            message = "Member access granted.",
-            role = User.FindFirstValue(ClaimTypes.Role)
-        });
-    }
 
-    [HttpGet("librarian")]
-    [Authorize(Roles = "Librarian")]
-    public IActionResult LibrarianAccess()
-    {
-        return Ok(new
-        {
-            message = "Librarian administrative access granted.",
-            role = User.FindFirstValue(ClaimTypes.Role)
-        });
-    }
 }

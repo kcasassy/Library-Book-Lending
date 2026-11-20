@@ -5,6 +5,7 @@ using Library_Book_Lending.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Library_Book_Lending.Controllers;
 
@@ -14,10 +15,14 @@ namespace Library_Book_Lending.Controllers;
 public class BookReservationsController : ControllerBase
 {
     private readonly LibraryDbContext _context;
+    private readonly LibrarySettings _settings;
 
-    public BookReservationsController(LibraryDbContext context)
+    public BookReservationsController(
+        LibraryDbContext context,
+        IOptions<LibrarySettings> settings)
     {
         _context = context;
+        _settings = settings.Value;
     }
 
     [HttpPost]
@@ -48,7 +53,7 @@ public class BookReservationsController : ControllerBase
             .AnyAsync(r =>
                 r.UserId == userId &&
                 r.BookId == request.BookId &&
-                (r.Status == "Pending" || r.Status == "Approved") &&
+                (r.Status == ReservationStatuses.Pending || r.Status == ReservationStatuses.Approved) &&
                 r.ExpiresAt > now);
 
         if (existingReservation)
@@ -62,7 +67,7 @@ public class BookReservationsController : ControllerBase
         var activeReservations = await _context.BookReservations
             .CountAsync(r =>
                 r.BookId == request.BookId &&
-                (r.Status == "Pending" || r.Status == "Approved") &&
+                (r.Status == ReservationStatuses.Pending || r.Status == ReservationStatuses.Approved) &&
                 r.ExpiresAt > now);
 
         if (activeReservations >= book.AvailableCopies)
@@ -89,8 +94,8 @@ public class BookReservationsController : ControllerBase
             UserId = userId,
             BookId = request.BookId,
             ReservedAt = now,
-            ExpiresAt = now.AddDays(3),
-            Status = "Pending"
+            ExpiresAt = now.AddDays(_settings.ReservationHoldDays),
+            Status = ReservationStatuses.Pending
         };
 
         _context.BookReservations.Add(reservation);
@@ -188,7 +193,7 @@ public class BookReservationsController : ControllerBase
             });
         }
 
-        if (reservation.Status != "Pending")
+        if (reservation.Status != ReservationStatuses.Pending)
         {
             return BadRequest(new
             {
@@ -198,7 +203,7 @@ public class BookReservationsController : ControllerBase
 
         if (reservation.ExpiresAt <= DateTime.UtcNow)
         {
-            reservation.Status = "Expired";
+            reservation.Status = ReservationStatuses.Expired;
             await _context.SaveChangesAsync();
 
             return BadRequest(new
@@ -209,7 +214,7 @@ public class BookReservationsController : ControllerBase
 
         var newStatus = request.Status.Trim();
 
-        if (newStatus != "Approved" && newStatus != "Rejected")
+        if (newStatus != ReservationStatuses.Approved && newStatus != ReservationStatuses.Rejected)
         {
             return BadRequest(new
             {
@@ -251,7 +256,7 @@ public class BookReservationsController : ControllerBase
             });
         }
 
-        if (reservation.Status != "Pending")
+        if (reservation.Status != ReservationStatuses.Pending)
         {
             return BadRequest(new
             {
@@ -259,7 +264,7 @@ public class BookReservationsController : ControllerBase
             });
         }
 
-        reservation.Status = "Cancelled";
+        reservation.Status = ReservationStatuses.Cancelled;
 
         await _context.SaveChangesAsync();
 

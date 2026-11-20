@@ -128,7 +128,7 @@ public class ReadingSpacesController : ControllerBase
         var hasOversizedReservation = await _context.ReadingSpaceReservations
             .AnyAsync(r =>
                 r.ReadingSpaceId == id &&
-                (r.Status == "Pending" || r.Status == "Approved") &&
+                (r.Status == ReservationStatuses.Pending || r.Status == ReservationStatuses.Approved) &&
                 r.NumberOfPeople > request.Capacity);
 
         if (hasOversizedReservation)
@@ -163,7 +163,7 @@ public class ReadingSpacesController : ControllerBase
         var hasActiveReservations = await _context.ReadingSpaceReservations
             .AnyAsync(r =>
                 r.ReadingSpaceId == id &&
-                (r.Status == "Pending" || r.Status == "Approved") &&
+                (r.Status == ReservationStatuses.Pending || r.Status == ReservationStatuses.Approved) &&
                 r.EndTime > DateTime.UtcNow);
 
         if (hasActiveReservations)

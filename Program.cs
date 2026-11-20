@@ -1,5 +1,6 @@
 using System.Text;
 using Library_Book_Lending.Data;
+using Library_Book_Lending.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -41,6 +42,9 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContext<LibraryDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.Configure<LibrarySettings>(
+    builder.Configuration.GetSection(LibrarySettings.SectionName));
 
 builder.Services.AddCors(options =>
 {

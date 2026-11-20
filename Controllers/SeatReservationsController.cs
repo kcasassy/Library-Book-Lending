@@ -103,7 +103,7 @@ public class SeatReservationsController : ControllerBase
             .Where(s => s.IsActive &&
                 !_context.SeatReservations.Any(r =>
                     r.SeatId == s.Id &&
-                    (r.Status == "Pending" || r.Status == "Approved") &&
+                    (r.Status == ReservationStatuses.Pending || r.Status == ReservationStatuses.Approved) &&
                     r.StartTime < endTime &&
                     r.EndTime > startTime))
             .OrderBy(s => s.SeatNumber)
@@ -180,7 +180,7 @@ public class SeatReservationsController : ControllerBase
 
         var conflict = await _context.SeatReservations.AnyAsync(r =>
             r.SeatId == request.SeatId &&
-            (r.Status == "Pending" || r.Status == "Approved") &&
+            (r.Status == ReservationStatuses.Pending || r.Status == ReservationStatuses.Approved) &&
             r.StartTime < endTime &&
             r.EndTime > startTime);
 
@@ -196,7 +196,7 @@ public class SeatReservationsController : ControllerBase
             SeatId = request.SeatId,
             StartTime = startTime,
             EndTime = endTime,
-            Status = "Pending"
+            Status = ReservationStatuses.Pending
         };
 
         _context.SeatReservations.Add(reservation);
@@ -230,13 +230,13 @@ public class SeatReservationsController : ControllerBase
         if (reservation == null)
             return NotFound(new { message = "Reservation not found." });
 
-        if (reservation.Status != "Pending")
+        if (reservation.Status != ReservationStatuses.Pending)
             return BadRequest(new
             {
                 message = "Only pending reservations can be approved or rejected."
             });
 
-        if (request.Status == "Approved")
+        if (request.Status == ReservationStatuses.Approved)
         {
             if (reservation.EndTime <= DateTime.UtcNow)
                 return BadRequest(new
@@ -247,7 +247,7 @@ public class SeatReservationsController : ControllerBase
             var conflict = await _context.SeatReservations.AnyAsync(r =>
                 r.Id != id &&
                 r.SeatId == reservation.SeatId &&
-                (r.Status == "Pending" || r.Status == "Approved") &&
+                (r.Status == ReservationStatuses.Pending || r.Status == ReservationStatuses.Approved) &&
                 r.StartTime < reservation.EndTime &&
                 r.EndTime > reservation.StartTime);
 
@@ -289,13 +289,13 @@ public class SeatReservationsController : ControllerBase
         if (reservation.UserId != userId.Value)
             return Forbid();
 
-        if (reservation.Status != "Pending")
+        if (reservation.Status != ReservationStatuses.Pending)
             return BadRequest(new
             {
                 message = "Only pending reservations can be cancelled."
             });
 
-        reservation.Status = "Cancelled";
+        reservation.Status = ReservationStatuses.Cancelled;
 
         await _context.SaveChangesAsync();
 

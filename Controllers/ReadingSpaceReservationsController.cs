@@ -166,7 +166,7 @@ public class ReadingSpaceReservationsController : ControllerBase
 
         var hasConflict = await _context.ReadingSpaceReservations.AnyAsync(r =>
             r.ReadingSpaceId == request.ReadingSpaceId &&
-            (r.Status == "Pending" || r.Status == "Approved") &&
+            (r.Status == ReservationStatuses.Pending || r.Status == ReservationStatuses.Approved) &&
             startTime < r.EndTime &&
             endTime > r.StartTime);
 
@@ -185,7 +185,7 @@ public class ReadingSpaceReservationsController : ControllerBase
             StartTime = startTime,
             EndTime = endTime,
             NumberOfPeople = request.NumberOfPeople,
-            Status = "Pending"
+            Status = ReservationStatuses.Pending
         };
 
         _context.ReadingSpaceReservations.Add(reservation);
@@ -216,7 +216,7 @@ public class ReadingSpaceReservationsController : ControllerBase
             return NotFound(new { message = "Reservation not found." });
         }
 
-        if (reservation.Status != "Pending")
+        if (reservation.Status != ReservationStatuses.Pending)
         {
             return BadRequest(new
             {
@@ -224,7 +224,7 @@ public class ReadingSpaceReservationsController : ControllerBase
             });
         }
 
-        if (request.Status != "Approved" && request.Status != "Rejected")
+        if (request.Status != ReservationStatuses.Approved && request.Status != ReservationStatuses.Rejected)
         {
             return BadRequest(new
             {
@@ -232,7 +232,7 @@ public class ReadingSpaceReservationsController : ControllerBase
             });
         }
 
-        if (request.Status == "Approved")
+        if (request.Status == ReservationStatuses.Approved)
         {
             if (reservation.ReadingSpace == null || !reservation.ReadingSpace.IsActive)
             {
@@ -253,7 +253,7 @@ public class ReadingSpaceReservationsController : ControllerBase
             var hasConflict = await _context.ReadingSpaceReservations.AnyAsync(r =>
                 r.Id != id &&
                 r.ReadingSpaceId == reservation.ReadingSpaceId &&
-                (r.Status == "Pending" || r.Status == "Approved") &&
+                (r.Status == ReservationStatuses.Pending || r.Status == ReservationStatuses.Approved) &&
                 reservation.StartTime < r.EndTime &&
                 reservation.EndTime > r.StartTime);
 
@@ -297,7 +297,7 @@ public class ReadingSpaceReservationsController : ControllerBase
             return Forbid();
         }
 
-        if (reservation.Status != "Pending")
+        if (reservation.Status != ReservationStatuses.Pending)
         {
             return BadRequest(new
             {
@@ -305,7 +305,7 @@ public class ReadingSpaceReservationsController : ControllerBase
             });
         }
 
-        reservation.Status = "Cancelled";
+        reservation.Status = ReservationStatuses.Cancelled;
         await _context.SaveChangesAsync();
 
         return Ok(new { message = "Reservation cancelled successfully." });

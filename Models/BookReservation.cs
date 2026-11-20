@@ -17,7 +17,7 @@ public class BookReservation
 
     [Required]
     [MaxLength(30)]
-    public string Status { get; set; } = "Pending";
+    public string Status { get; set; } = ReservationStatuses.Pending;
 
     public User? User { get; set; }
 

@@ -3,8 +3,7 @@
 
 const moduleRoot = () => document.getElementById("viewContainer");
 const currentRole = () => String(getCurrentUser()?.role || "").toLowerCase();
-const isStaff = () => ["admin", "librarian"].includes(currentRole());
-const isAdmin = () => currentRole() === "admin";
+const isStaff = () => currentRole() === "librarian";
 const esc = value => String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
 const dateValue = value => value ? new Date(value).toLocaleString() : "—";
 const inputDate = value => value ? new Date(value).toISOString().slice(0, 16) : "";
@@ -802,24 +801,73 @@ async function renderReports() {
 }
 
 async function renderUsers() {
-    if (!isAdmin()) {
-        throw new Error("Only administrators can view user management.");
+    if (!isStaff()) {
+        throw new Error("Only librarians can manage members.");
     }
 
-    moduleShell("User Management", "View registered member and staff accounts.");
+    moduleShell("User Management", "View accounts and update member memberships.");
 
-    const rows = await loadList("/Users");
+    const load = async () => {
+        const rows = await loadList("/Users");
 
-    document.getElementById("moduleTableHost").innerHTML = tableMarkup([
-        { label: "ID", key: "id" },
-        { label: "Full name", key: "fullName" },
-        { label: "Email", key: "email" },
-        { label: "Role", key: "role" },
-        { label: "Member no.", key: "memberNumber" },
-        { label: "Membership expiry", render: r => dateValue(r.membershipExpiry) },
-        { label: "Status", render: r => r.isActive ? "Active" : "Inactive" },
-        { label: "Created", render: r => dateValue(r.createdAt) }
-    ], rows, () => "View only");
+        document.getElementById("moduleTableHost").innerHTML = tableMarkup([
+            { label: "ID", key: "id" },
+            { label: "Full name", key: "fullName" },
+            { label: "Email", key: "email" },
+            { label: "Role", key: "role" },
+            { label: "Member no.", key: "memberNumber" },
+            { label: "Membership expiry", render: r => dateValue(r.membershipExpiry) },
+            { label: "Status", render: r => r.isActive ? "Active" : "Inactive" },
+            { label: "Created", render: r => dateValue(r.createdAt) }
+        ], rows, r =>
+            r.role === "Member"
+                ? actionButton("Edit membership", "edit", r.id)
+                : "—"
+        );
+    };
+
+    await load();
+
+    bindTableActions(async (action, id) => {
+        if (action !== "edit") return;
+
+        const rows = await loadList("/Users");
+        const row = rows.find(x => x.id === id);
+
+        if (!row) {
+            throw new Error("Member not found.");
+        }
+
+        const statusOptions = row.isActive
+            ? [{ value: "true", label: "Active" }, { value: "false", label: "Inactive" }]
+            : [{ value: "false", label: "Inactive" }, { value: "true", label: "Active" }];
+
+        showModuleForm([
+            {
+                name: "membershipExpiry",
+                label: "Membership expiry",
+                type: "date",
+                value: row.membershipExpiry ? inputDate(row.membershipExpiry).slice(0, 10) : ""
+            },
+            {
+                name: "isActive",
+                label: "Account status",
+                type: "select",
+                options: statusOptions
+            }
+        ], "Update member", async d => {
+            await apiRequest(`/Users/${id}`, {
+                method: "PUT",
+                body: JSON.stringify({
+                    membershipExpiry: d.membershipExpiry,
+                    isActive: d.isActive === "true"
+                })
+            });
+
+            await load();
+            moduleMessage("Member updated.", "success");
+        });
+    });
 }
 
 async function renderModule(view) {
