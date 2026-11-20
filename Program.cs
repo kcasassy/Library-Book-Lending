@@ -46,20 +46,9 @@ builder.Services.AddDbContext<LibraryDbContext>(options =>
 builder.Services.Configure<LibrarySettings>(
     builder.Configuration.GetSection(LibrarySettings.SectionName));
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("LibraryFrontend", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
-});
+var jwtKey = builder.Configuration["Jwt:Key"]?.Trim();
 
-var jwtKey = builder.Configuration["Jwt:Key"]
-    ?? throw new InvalidOperationException("JWT Key is missing.");
-
-if (jwtKey.Trim().Length < 32)
+if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32)
 {
     throw new InvalidOperationException(
         "Jwt:Key must be at least 32 characters. See README section 6.2.");
@@ -73,8 +62,11 @@ var jwtAudience = builder.Configuration["Jwt:Audience"]
 
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme =
+        JwtBearerDefaults.AuthenticationScheme;
+
+    options.DefaultChallengeScheme =
+        JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options =>
 {
@@ -103,11 +95,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
 app.UseDefaultFiles();
 app.UseStaticFiles();
-app.UseCors("LibraryFrontend");
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 
 using (var scope = app.Services.CreateScope())

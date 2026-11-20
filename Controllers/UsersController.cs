@@ -58,7 +58,7 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> GetAllUsers()
     {
         var users = await _context.Users
-            .OrderBy(u => u.FullName)
+            .OrderBy(u => u.Id)
             .Select(u => new UserResponse
             {
                 Id = u.Id,

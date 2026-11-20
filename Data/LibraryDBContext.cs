@@ -27,6 +27,10 @@ public class LibraryDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<User>()
+        .Property(u => u.Id)
+        .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<User>()
             .HasIndex(u => u.Email)
             .IsUnique();
 
