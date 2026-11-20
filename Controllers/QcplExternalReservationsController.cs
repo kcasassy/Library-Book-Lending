@@ -1,6 +1,4 @@
 ﻿
-// ASSIGNED TO: KIM — BACKEND
-// PROJECT: Library Reservation Management System Practice
 
 using Library_Book_Lending.Data;
 using Library_Book_Lending.DTOs;
